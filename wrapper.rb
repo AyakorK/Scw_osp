@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+
+class IncorrectParameter < StandardError
+  def initialize(msg = "Error: Incorrect parameter format, please make a parameter that follows KEY:VALUE")
+    super
+  end
+end
+class InvalidKey < StandardError
+  def initialize(msg = "Error: Incorrect parameter selected, it must be ID, IP or NAME")
+    super
+  end
+end
 # Class for the Wrapper that will give us our data
 class Wrapper
   def initialize
@@ -11,27 +22,26 @@ class Wrapper
     puts `scw instance server list`
   end
 
-  def scw_get(param)
-    return puts 'Error: Incorrect parameter format, please make a parameter that follows KEY:VALUE'  unless parameter_format?(param)
-    key, value = param.downcase.split(':')
-    return puts 'Error: Incorrect parameter selected, it must be ID, IP or NAME' unless check_parameter_validity(key)
+  def get(options)
+    begin
+      # raise IncorrectParameter unless param.include?(':')
+      # key, value = param.downcase.split(':')
 
-    key = 'private-ip' if key == 'ip'
-    key = 'project-id' if key == 'id'
-    puts 'No results found' and return nil if `scw instance server list [#{key}=#{value}]`.empty?
+      # TODO: Be able to give multiple options
+      search = "#{options.keys.first}=#{options[options.keys.first]}"
 
-    puts `scw instance server list [#{key}=#{value}]`
-  end
-
-  def parameter_format?(param)
-    return false unless param.include?(':')
-
-    true
-  end
-
-  def check_parameter_validity(key)
-    return false unless %w[id ip name].include?(key)
-
-    true
+      instance = `scw instance server list #{search}`
+      if instance.empty?
+        puts 'No results found'
+      else
+        puts instance
+      end
+    rescue IncorrectParameter => e
+      # output: red
+      puts "[#{e.class}] - #{e.message}"
+    rescue InvalidKey => e
+      # output: yellow
+      puts "[#{e.class}] - #{e.message}"
+    end
   end
 end
