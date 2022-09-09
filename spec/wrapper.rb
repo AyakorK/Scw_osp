@@ -14,28 +14,45 @@ describe Wrapper do
     end
   end
 
-  describe '#scw_get' do
-    it 'should return an error message if the ID is incorrect' do
-      expect { @wrapper.scw_get('ID:ABCDEF') }.to output('No results found').to_stdout
+  describe 'get' do
+    it 'should return an error message if the name is incorrect' do
+      expect { @wrapper.get({ 'name' => 'test_name' }) }.to output(/Error: No Results Found/).to_stdout
     end
-    it 'should return an error message if the IP is incorrect' do
-      expect { @wrapper.scw_get('IP:IAZRJEZ') }.to output('No results found').to_stdout
+    it 'should return an error message if the private_ip is incorrect' do
+      expect { @wrapper.get({ 'private_ip' => '11.11.11.11' }) }.to output(/Error: No Results Found/).to_stdout
     end
-    it 'should return an error message if the NAME is incorrect' do
-      expect { @wrapper.scw_get('NAME:30230120') }.to output('No results found').to_stdout
-    end
-    it 'should return an error message if the parameter is incorrect' do
+    it 'should return an error message if the private_ip is incorrect and the name is correct' do
       expect do
-        @wrapper.scw_get('ABCDEF')
-      end.to output('Error: Incorrect parameter format, please make a parameter that follows KEY:VALUE').to_stdout
+        @wrapper.get({ 'private_ip' => '11.11.11.11',
+                       'name' => 'metabase-dev' })
+      end.to output(/Error: No Results Found/).to_stdout
     end
-    it 'should return an error message if the parameter is empty' do
-      expect do
-        @wrapper.scw_get('')
-      end.to output('Error: Incorrect parameter format, please make a parameter that follows KEY:VALUE').to_stdout
+    it 'should be equal to @wrapper.list if it get no parameters' do
+      expect { @wrapper.get({}) }.to output(@wrapper.list).to_stdout
     end
     it 'should return a server if everything is correct and a result is found' do
-      expect { @wrapper.scw_get('ID:11111111-1111-1111-1111-111111111111') }.to output.to_stdout
+      expect { @wrapper.get({ 'private_ip' => '10.71.46.65', 'name' => 'metabase-dev' }) }.to output.to_stdout
+    end
+  end
+
+  describe 'checkup' do
+    it 'should return a message if all servers are running' do
+      expect { @wrapper.checkup }.to output(/Every instance is running !/).to_stdout
+    end
+    #     it 'should return a server if one server is stopped' do
+    #       expect { @wrapper.checkup }.to output ('stopped').to_stdout if @wrapper.list =~ /stopped/
+    #     end
+  end
+
+  describe 'server_details' do
+    it 'should return an error message if the id is incorrect' do
+      expect do
+        @wrapper.server_details({ 'id' => '11111111-1111-1111-1111-111111111111' })
+      end.to output(/No results found/).to_stdout
+    end
+    it 'should return a server if the id is correct' do
+      # expect { @wrapper.server_details({"id"=>"1a0e66a4-b8c3-4d77-a3fc-9bfe96990e13"}) } to contain Project
+      expect { @wrapper.server_details({ 'id' => '1a0e66a4-b8c3-4d77-a3fc-9bfe96990e1c' }) }.to output.to_stdout
     end
   end
 end
