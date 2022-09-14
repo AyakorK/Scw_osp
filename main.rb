@@ -14,6 +14,8 @@ class ScwOsp < Thor
   long_desc <<-LONGDESC
     Returns information for the given instance
 
+    > & main.rb get --id <SCW ID>
+
     > $ main.rb get --name example-instance
 
     > $ main.rb get --private-ip <SCW PRIVATE IP>
@@ -24,6 +26,7 @@ class ScwOsp < Thor
 
   LONGDESC
 
+  option :id, aliases: '-i', type: :string, desc: 'ID of the server'
   option :name, aliases: '-n', type: :string, desc: 'Name of the instance'
   option :state, aliases: '-s', type: :string, desc: 'State of the instance'
   option :private_ip, aliases: '-pip', type: :string, desc: 'Private IP of the instance'

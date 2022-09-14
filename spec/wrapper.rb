@@ -15,23 +15,38 @@ describe Wrapper do
   end
 
   describe 'get' do
-    it 'should return an error message if the name is incorrect' do
-      expect { @wrapper.get({ 'name' => 'test_name' }) }.to output(/Error: No Results Found/).to_stdout
+    context 'If the name is incorrect' do
+      it 'should return an error message if the name is incorrect' do
+        expect { @wrapper.get({ 'name' => 'test_name' }) }.to output(/Error: No Results Found/).to_stdout
+      end
     end
-    it 'should return an error message if the private_ip is incorrect' do
-      expect { @wrapper.get({ 'private_ip' => '11.11.11.11' }) }.to output(/Error: No Results Found/).to_stdout
+    context 'If the private_ip is incorrect' do
+      it 'should return an error message' do
+        expect { @wrapper.get({ 'private_ip' => '11.11.11.11' }) }.to output(/Error: No Results Found/).to_stdout
+      end
     end
-    it 'should return an error message if the private_ip is incorrect and the name is correct' do
-      expect do
-        @wrapper.get({ 'private_ip' => '11.11.11.11',
-                       'name' => 'metabase-dev' })
-      end.to output(/Error: No Results Found/).to_stdout
+    context 'If the private_ip is incorrect and the name is correct' do
+      it 'should return an error message' do
+        expect do
+          @wrapper.get({ 'private_ip' => '11.11.11.11',
+                         'name' => 'metabase-dev' })
+        end.to output(/Error: No Results Found/).to_stdout
+      end
     end
-    it 'should be equal to @wrapper.list if it get no parameters' do
-      expect { @wrapper.get({}) }.to output(@wrapper.list).to_stdout
+    context 'If get has no parameters' do
+      it 'should return the list of servers' do
+        expect { @wrapper.get({}) }.to output.to_stdout
+      end
     end
-    it 'should return a server if everything is correct and a result is found' do
-      expect { @wrapper.get({ 'private_ip' => '10.71.46.65', 'name' => 'metabase-dev' }) }.to output.to_stdout
+    context 'If everything is correct' do
+      it 'should return a server' do
+        expect { @wrapper.get({ 'private_ip' => '10.71.46.65', 'name' => 'metabase-dev' }) }.to output.to_stdout
+      end
+    end
+    context 'User is searching for an id' do
+      it 'should return a server if everything is correct and a result is found' do
+        expect { @wrapper.get({ 'id' => 'e0c2b2e7-1c9e-4d0e-8d1c-7c8a8e0e4d4c' }) }.to output.to_stdout
+      end
     end
   end
 
